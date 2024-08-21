@@ -1,4 +1,4 @@
-[gd_scene load_steps=54 format=3 uid="uid://b0y4ab0j3cdtm"]
+[gd_scene load_steps=63 format=3 uid="uid://b0y4ab0j3cdtm"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_iml0n"]
 [ext_resource type="Texture2D" uid="uid://jlbd6fciau5b" path="res://Sprites/Attacks.png" id="2_p0pky"]
@@ -8,6 +8,8 @@
 [ext_resource type="Texture2D" uid="uid://dy8q0rhrdyta5" path="res://Sprites/Jump.png" id="6_l6w06"]
 [ext_resource type="Texture2D" uid="uid://qo6n4e3jmjr" path="res://Sprites/attack_from_air.png" id="7_eivhe"]
 [ext_resource type="Texture2D" uid="uid://gj207r5xq6n3" path="res://Sprites/Run.png" id="8_4fr8k"]
+[ext_resource type="Script" path="res://ui.gd" id="9_haflh"]
+[ext_resource type="Texture2D" uid="uid://cfr78e0yrgfa5" path="res://7aac4f16-e89d-4185-96b9-8957df9cdaf7.png" id="10_7san8"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_euooy"]
 atlas = ExtResource("2_p0pky")
@@ -199,7 +201,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_gtkg4")
 }],
-"loop": true,
+"loop": false,
 "name": &"attack",
 "speed": 5.0
 }, {
@@ -352,15 +354,130 @@ animations = [{
 radius = 8.0
 height = 42.0
 
-[node name="CharacterBody2D" type="CharacterBody2D"]
+[sub_resource type="Theme" id="Theme_8rnfv"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0m4at"]
+bg_color = Color(1, 0, 0.266667, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nggcj"]
+bg_color = Color(0, 1, 0, 1)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_188dg"]
+radius = 64.0078
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_so1e8"]
+bg_color = Color(0.215697, 0.306057, 0.293579, 1)
+shadow_color = Color(0.208631, 0.312846, 0.132341, 0.6)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6tk6x"]
+
+[sub_resource type="Theme" id="Theme_xh41t"]
+
+[node name="Player" type="CharacterBody2D" groups=["Player"]]
 script = ExtResource("1_iml0n")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_pi5ks")
-animation = &"jump"
+animation = &"attack"
 autoplay = "idle"
 speed_scale = 2.005
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(2, 8)
 shape = SubResource("CapsuleShape2D_dxyt5")
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+offset_left = -39.0
+offset_top = -30.0
+offset_right = 42.0
+offset_bottom = -21.0
+theme = SubResource("Theme_8rnfv")
+theme_override_styles/background = SubResource("StyleBoxFlat_0m4at")
+theme_override_styles/fill = SubResource("StyleBoxFlat_nggcj")
+max_value = 10.0
+value = 10.0
+show_percentage = false
+
+[node name="PickupZone" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupZone"]
+shape = SubResource("CircleShape2D_188dg")
+
+[node name="UI" type="CanvasLayer" parent="."]
+script = ExtResource("9_haflh")
+
+[node name="Control" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -63.0
+offset_top = -6.0
+offset_right = -63.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Experience" type="ProgressBar" parent="UI/Control"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 27.0
+grow_horizontal = 2
+
+[node name="LevelUpNotice" type="PanelContainer" parent="UI/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -512.0
+offset_top = -533.0
+offset_right = -212.0
+offset_bottom = -233.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_so1e8")
+
+[node name="TextureRect" type="TextureRect" parent="UI/Control/LevelUpNotice"]
+layout_mode = 2
+texture = ExtResource("10_7san8")
+expand_mode = 5
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/Control/LevelUpNotice"]
+modulate = Color(0.284133, 0.636792, 0.471574, 1)
+self_modulate = Color(0.470588, 0.447059, 1, 1)
+material = SubResource("ShaderMaterial_6tk6x")
+custom_minimum_size = Vector2(300, 150)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+size_flags_stretch_ratio = 1.09
+theme = SubResource("Theme_xh41t")
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 49
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = -2650
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Control/LevelUpNotice/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+
+[node name="btn_slash_level" type="Button" parent="UI/Control/LevelUpNotice/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Level Up Slash"
+
+[node name="btn_speed_level" type="Button" parent="UI/Control/LevelUpNotice/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Level Up Speed"
+
+[node name="btn_health_level" type="Button" parent="UI/Control/LevelUpNotice/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Level Up Health"
+
+[connection signal="area_entered" from="PickupZone" to="." method="_on_pickup_zone_area_entered"]
+[connection signal="pressed" from="UI/Control/LevelUpNotice/MarginContainer/VBoxContainer/btn_slash_level" to="." method="_on_btn_slash_level_pressed"]
+[connection signal="pressed" from="UI/Control/LevelUpNotice/MarginContainer/VBoxContainer/btn_speed_level" to="." method="_on_btn_speed_level_pressed"]
+[connection signal="pressed" from="UI/Control/LevelUpNotice/MarginContainer/VBoxContainer/btn_health_level" to="." method="_on_btn_health_level_pressed"]
